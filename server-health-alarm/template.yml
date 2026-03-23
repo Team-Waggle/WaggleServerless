@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: EC2 서버 상태 CloudWatch 경보
+
+Parameters:
+  DiscordWebhookUrl:
+    Type: String
+    NoEcho: true
+    Description: Discord Webhook URL
+
+  InstanceId:
+    Type: String
+    Description: 모니터링 대상 EC2 인스턴스 ID
+
+  DiscordMentionRoleId:
+    Type: String
+    Description: Discord 멘션할 롤 ID
+
+  CpuThreshold:
+    Type: Number
+    Default: 80
+    Description: CPU 사용률 임계값 (%)
+
+  EvaluationPeriods:
+    Type: Number
+    Default: 3
+    Description: 연속 위반 횟수
+
+  Period:
+    Type: Number
+    Default: 300
+    Description: 측정 주기 (초)
+
+Resources:
+  AlarmSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: waggle-server-health-alarm
+
+  CloudWatchToDiscordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: waggle-server-health-alarm
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Timeout: 30
+      CodeUri: src/
+      Environment:
+        Variables:
+          DISCORD_WEBHOOK_URL: !Ref DiscordWebhookUrl
+          DISCORD_MENTION_ROLE_ID: !Ref DiscordMentionRoleId
+      Events:
+        SnsEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref AlarmSnsTopic
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2022
+        EntryPoints:
+          - index.ts
+
+  CpuAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: waggle-ec2-cpu-high
+      AlarmDescription: !Sub "EC2 CPU 사용률이 ${CpuThreshold}%를 ${EvaluationPeriods}회 연속 초과"
+      Namespace: AWS/EC2
+      MetricName: CPUUtilization
+      Statistic: Average
+      Period: !Ref Period
+      EvaluationPeriods: !Ref EvaluationPeriods
+      Threshold: !Ref CpuThreshold
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: InstanceId
+          Value: !Ref InstanceId
+      AlarmActions:
+        - !Ref AlarmSnsTopic
+      OKActions:
+        - !Ref AlarmSnsTopic
+      TreatMissingData: missing
+
+Outputs:
+  FunctionArn:
+    Value: !GetAtt CloudWatchToDiscordFunction.Arn
+  AlarmName:
+    Value: !Ref CpuAlarm
+  SnsTopicArn:
+    Value: !Ref AlarmSnsTopic

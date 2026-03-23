@@ -1,0 +1,12 @@
+{
+  "name": "server-health-alarm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.7.0"
+  }
+}
