@@ -23,9 +23,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
-        working-directory: server-health-alarm
-        run: npm ci
+      - name: Install esbuild
+        run: npm install -g esbuild
 
       - uses: aws-actions/setup-sam@v2
 
