@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: EC2 서버 상태 CloudWatch 경보
+Description: EC2 server health CloudWatch alarm to Discord
 
 Parameters:
   DiscordWebhookUrl:
@@ -10,26 +10,26 @@ Parameters:
 
   InstanceId:
     Type: String
-    Description: 모니터링 대상 EC2 인스턴스 ID
+    Description: EC2 instance ID to monitor
 
   DiscordMentionRoleId:
     Type: String
-    Description: Discord 멘션할 롤 ID
+    Description: Discord role ID to mention
 
   CpuThreshold:
     Type: Number
     Default: 80
-    Description: CPU 사용률 임계값 (%)
+    Description: CPU utilization threshold (%)
 
   EvaluationPeriods:
     Type: Number
     Default: 3
-    Description: 연속 위반 횟수
+    Description: Number of consecutive breaches
 
   Period:
     Type: Number
     Default: 300
-    Description: 측정 주기 (초)
+    Description: Evaluation period in seconds
 
 Resources:
   AlarmSnsTopic:
@@ -66,7 +66,7 @@ Resources:
     Type: AWS::CloudWatch::Alarm
     Properties:
       AlarmName: waggle-ec2-cpu-high
-      AlarmDescription: !Sub "EC2 CPU 사용률이 ${CpuThreshold}%를 ${EvaluationPeriods}회 연속 초과"
+      AlarmDescription: !Sub "EC2 CPU utilization exceeded ${CpuThreshold}% for ${EvaluationPeriods} consecutive periods"
       Namespace: AWS/EC2
       MetricName: CPUUtilization
       Statistic: Average
