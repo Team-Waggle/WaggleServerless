@@ -1,0 +1,45 @@
+name: Deploy server-health-alarm
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "server-health-alarm/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: server-health-alarm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/setup-sam@v2
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::619071335871:role/waggle-serverless-oidc-role
+          aws-region: ap-northeast-2
+
+      - name: Build
+        working-directory: server-health-alarm
+        run: sam build
+
+      - name: Deploy
+        working-directory: server-health-alarm
+        run: |
+          sam deploy \
+            --stack-name waggle-server-health-alarm \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides \
+              DiscordWebhookUrl=${{ secrets.DISCORD_WEBHOOK_URL }} \
+              InstanceId=${{ secrets.EC2_INSTANCE_ID }} \
+              DiscordMentionRoleId=${{ secrets.DISCORD_MENTION_ROLE_ID }} \
+              CpuThreshold=${{ vars.CPU_THRESHOLD }}
