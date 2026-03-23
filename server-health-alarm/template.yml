@@ -41,10 +41,10 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: waggle-server-health-alarm
-      Handler: index.handler
+      Handler: src/index.handler
       Runtime: nodejs22.x
       Timeout: 30
-      CodeUri: src/
+      CodeUri: ./
       Environment:
         Variables:
           DISCORD_WEBHOOK_URL: !Ref DiscordWebhookUrl
@@ -60,7 +60,7 @@ Resources:
         Minify: true
         Target: es2022
         EntryPoints:
-          - index.ts
+          - src/index.ts
 
   CpuAlarm:
     Type: AWS::CloudWatch::Alarm

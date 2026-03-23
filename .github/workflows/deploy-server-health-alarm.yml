@@ -50,4 +50,4 @@ jobs:
               DiscordWebhookUrl=${{ secrets.DISCORD_WEBHOOK_URL }} \
               InstanceId=${{ secrets.EC2_INSTANCE_ID }} \
               DiscordMentionRoleId=${{ secrets.DISCORD_MENTION_ROLE_ID }} \
-              CpuThreshold=${{ vars.CPU_THRESHOLD }}
+              CpuThreshold=${{ vars.CPU_THRESHOLD || '80' }}
