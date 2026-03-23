@@ -37,7 +37,7 @@ Resources:
     Properties:
       TopicName: waggle-server-health-alarm
 
-  CloudWatchToDiscordFunction:
+  ServerHealthAlarmFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: waggle-server-health-alarm
@@ -85,7 +85,7 @@ Resources:
 
 Outputs:
   FunctionArn:
-    Value: !GetAtt CloudWatchToDiscordFunction.Arn
+    Value: !GetAtt ServerHealthAlarmFunction.Arn
   AlarmName:
     Value: !Ref CpuAlarm
   SnsTopicArn:
