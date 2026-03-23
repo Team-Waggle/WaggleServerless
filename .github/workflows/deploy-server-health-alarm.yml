@@ -42,6 +42,7 @@ jobs:
         run: |
           sam deploy \
             --stack-name waggle-server-health-alarm \
+            --resolve-s3 \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
             --capabilities CAPABILITY_IAM \
