@@ -42,7 +42,7 @@ export const handler = async (event: SNSEvent): Promise<void> => {
       `## ${emoji} CloudWatch 경보: ${NewStateValue}`,
       `<@&${DISCORD_MENTION_ROLE_ID}>`,
       `**경보 이름**: ${AlarmName}`,
-      `**시각**: ${StateChangeTime}`,
+      `**시각**: ${new Date(StateChangeTime).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}`,
       `**리전**: ${Region}`,
       `**인스턴스**: \`${instanceId}\``,
       `**메트릭**: ${Trigger.Namespace} / ${Trigger.MetricName}`,
